@@ -1,0 +1,36 @@
+- name: Party
+  entities:
+    light.party:
+      state: on
+    light.kitchen_bar_left:
+      state: on
+      rgb_color: [100, 122, 255]
+      brightness: 118
+    light.kitchen_bar_right:
+      state: on
+      rgb_color: [118, 191, 156]
+      brightness: 107
+    light.parlor_lamp:
+      state: on
+      rgb_color: [175, 131, 255]
+      brightness: 127
+    light.bedroom_lamp:
+      state: on
+      rgb_color: [175, 131, 255]
+      brightness: 127
+    light.family_light:
+      state: off
+    light.dining_room:
+      state: off
+    light.parlor_light:
+      state: off
+    light.kitchen_light:
+      state: off
+    light.bedroom_light:
+      state: off
+    light.office_light:
+      state: off
+    light.office_lamp:
+      state: off
+    light.landscape:
+      state: off

@@ -1,0 +1,101 @@
+- alias: Office Button 1 On
+  trigger:
+    platform: mqtt
+    topic: "switches/office1"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.office_light
+      state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.office_light
+- alias: Office Button 1 Off
+  trigger:
+    platform: mqtt
+    topic: "switches/office1"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.office_light
+      state: "on"
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.office_light
+
+
+- alias: Office Lamp Button (on)
+  trigger:
+    platform: mqtt
+    topic: "switches/office4"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.office_lamp
+      state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.office_lamp
+- alias: Office Lamp Button (off)
+  trigger:
+    platform: mqtt
+    topic: "switches/office4"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.office_lamp
+      state: "on"
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.office_lamp
+
+
+- alias: Office Bright Button (on)
+  trigger:
+    platform: mqtt
+    topic: "switches/office3"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.office_light
+      state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: scene.office_bright
+- alias: Office Bright Button (off)
+  trigger:
+    platform: mqtt
+    topic: "switches/office3"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.office_light
+      state: "on"
+  action:
+    service: homeassistant.turn_on
+    entity_id: scene.office_dark
+
+- alias: Test Test Test
+  trigger:
+    platform: mqtt
+    topic: "switches/kitchen0"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.kitchen_light
+      state: "on"
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.kitchen_light
+- alias: Test Test Test2
+  trigger:
+    platform: mqtt
+    topic: "switches/kitchen0"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.kitchen_light
+      state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.kitchen_light

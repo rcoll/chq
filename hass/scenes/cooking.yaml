@@ -1,0 +1,32 @@
+- name: Cooking
+  entities:
+    light.kitchen_light:
+      state: on
+    light.dining_room:
+      state: on
+    light.kitchen_bar_left:
+      state: on
+      rgb_color: [254, 254, 254]
+      brightness: 254
+    light.kitchen_bar_right:
+      state: on
+      rgb_color: [254, 254, 254]
+      brightness: 254
+    light.parlor_lamp:
+      state: off
+    light.bedroom_lamp:
+      state: off
+    light.family_light:
+      state: off
+    light.parlor_light:
+      state: off
+    light.bedroom_light:
+      state: off
+    light.office_light:
+      state: off
+    light.office_lamp:
+      state: off
+    light.landscape:
+      state: off
+    light.party:
+      state: off

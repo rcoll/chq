@@ -1,0 +1,59 @@
+### VIEWS
+default_view:
+  view: yes
+  icon: mdi:home
+  entities:
+    - device_tracker.rich_iphone
+    - device_tracker.tina_iphone
+    - group.downstairs
+    - group.kitchen
+    - group.bedroom
+    - group.office
+    - group.outdoors
+    - group.christmas
+
+downstairs:
+  name: Downstairs
+  entities:
+    - input_select.downstairs_scene
+    - light.family_light
+    - fan.family_fan
+    - light.dining_room
+    - light.parlor_light
+    - light.parlor_lamp
+    - media_player.apple_tv
+    - media_player.family_tv
+    - remote.apple_tv
+
+kitchen:
+  name: Kitchen
+  entities:
+    - light.kitchen_light
+    - light.kitchen_bar_left
+    - light.kitchen_bar_right
+
+bedroom:
+  name: Bedroom
+  entities:
+    - light.bedroom_light
+    - light.bedroom_lamp
+
+office:
+  name: Office
+  entities:
+    - input_select.office_scene
+    - light.office_light
+    - light.office_lamp
+    - media_player.office_tv
+
+outdoors:
+  name: Outdoors
+  entities:
+    - light.landscape
+    - light.party
+
+christmas:
+  name: Christmas
+  entities:
+    - light.christmas_tree
+    - light.christmas_outside

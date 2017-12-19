@@ -1,0 +1,16 @@
+rich_iphone:
+  hide_if_away: false
+  mac: !secret rich_iphone_mac
+  name: "Rich"
+  track: true
+  vendor: Apple, Inc.
+  gravatar: !secret rich_gravatar_email
+
+cortex:
+  hide_if_away: false
+  icon:
+  mac: !secret cortex_mac
+  name: cortex
+  picture:
+  track: true
+  vendor: Apple, Inc.

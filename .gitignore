@@ -1,0 +1,5 @@
+hass/phue.conf
+hass/secrets.yaml
+hass/home-assistant.log
+hass/home-assistant_v2.db
+hass/homebridge

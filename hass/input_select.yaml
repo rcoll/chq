@@ -1,0 +1,16 @@
+office_scene:
+  name: Office Scene
+  options:
+    - none
+    - Dark
+    - Dim
+    - Bright
+  initial: none
+  icon: mdi:candle
+
+downstairs_scene:
+  name: Downstairs Scene
+  options:
+    - none
+    - Cooking
+    - Party

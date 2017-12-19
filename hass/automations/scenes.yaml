@@ -1,0 +1,56 @@
+- alias: Scene Office Bright
+  trigger:
+    platform: state
+    entity_id: input_select.office_scene
+    to: "Bright"
+  action:
+    service: scene.turn_on
+    entity_id: scene.office_bright
+- alias: Scene Office Dim
+  trigger:
+    platform: state
+    entity_id: input_select.office_scene
+    to: "Dim"
+  action:
+    service: scene.turn_on
+    entity_id: scene.office_dim
+- alias: Scene Office Dark
+  trigger:
+    platform: state
+    entity_id: input_select.office_scene
+    to: "Dark"
+  action:
+    service: scene.turn_on
+    entity_id: scene.office_dark
+
+- alias: Scene Cooking
+  trigger:
+    platform: state
+    entity_id: input_select.downstairs_scene
+    to: "Cooking"
+  action:
+    service: scene.turn_on
+    entity_id: scene.cooking
+- alias: Scene Party
+  trigger:
+    platform: state
+    entity_id: input_select.downstairs_scene
+    to: "Party"
+  action:
+    service: scene.turn_on
+    entity_id: scene.party
+
+- alias: Turn On Christmas
+  trigger:
+    platform: time
+    at: '17:30:00'
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.christmas_tree
+- alias: Turn Off Christmas
+  trigger:
+    platform: time
+    at: '23:00:00'
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.christmas_tree

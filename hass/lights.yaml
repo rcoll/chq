@@ -1,0 +1,98 @@
+### BEDROOM
+- platform: mqtt
+  name: "Bedroom Light"
+  command_topic: "cmnd/sonoff3/power"
+  state_topic: "stat/sonoff3/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+
+### OFFICE
+- platform: mqtt
+  name: "Office Light"
+  command_topic: "cmnd/sonoff5/power"
+  state_topic: "stat/sonoff5/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+- platform: mqtt
+  name: "Office Lamp"
+  command_topic: "cmnd/sonoff6/power"
+  state_topic: "stat/sonoff6/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+
+### COMMON AREAS
+- platform: mqtt
+  name: "Family Light"
+  command_topic: "cmnd/sonoff2/power"
+  state_topic: "stat/sonoff2/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+- platform: mqtt
+  name: "Dining Room"
+  command_topic: "cmnd/sonoff9/power"
+  state_topic: "stat/sonoff9/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+- platform: mqtt
+  name: "Kitchen Light"
+  command_topic: "cmnd/sonoff11/power"
+  state_topic: "stat/sonoff11/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+- platform: mqtt
+  name: "Parlor Light"
+  command_topic: "cmnd/sonoff14/power"
+  state_topic: "stat/sonoff14/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+
+### OUTSIDE
+- platform: mqtt
+  name: "Landscape"
+  command_topic: "cmnd/sonoff10/power"
+  state_topic: "stat/sonoff10/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+- platform: mqtt
+  name: "Party"
+  command_topic: "cmnd/sonoff7/power"
+  state_topic: "stat/sonoff7/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+
+### TEMP
+- platform: mqtt
+  name: "Christmas Tree"
+  command_topic: "cmnd/sonoff13/power"
+  state_topic: "stat/sonoff13/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
+
+- platform: mqtt
+  name: "Christmas Outside"
+  command_topic: "cmnd/sonoff15/power"
+  state_topic: "stat/sonoff15/POWER"
+  payload_on: "ON"
+  payload_off: "OFF"
+  retain: true
+  qos: 1
