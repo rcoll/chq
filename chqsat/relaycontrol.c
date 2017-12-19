@@ -38,8 +38,6 @@ void selfTest() {
 }
 
 int main( void ) {
-	int i;
-
 	wiringPiSetup();
 	sr595Setup( 100, 8, 0, 1, 2 );
 
