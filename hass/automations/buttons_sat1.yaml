@@ -1,0 +1,99 @@
+- alias: Button - Sat1_12 - On
+  trigger:
+    platform: mqtt
+    topic: "switches/sat1/12"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.sat1_0
+      state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.sat1_0
+- alias: Button - Sat1_12 - Off
+  trigger:
+    platform: mqtt
+    topic: "switches/sat1/12"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.sat1_0
+      state: "on"
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.sat1_0
+
+- alias: Button - Sat1_13 - On
+  trigger:
+    platform: mqtt
+    topic: "switches/sat1/13"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.sat1_1
+      state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.sat1_1
+- alias: Button - Sat1_13 - Off
+  trigger:
+    platform: mqtt
+    topic: "switches/sat1/13"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.sat1_1
+      state: "on"
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.sat1_1
+
+- alias: Button - Sat1_14 - On
+  trigger:
+    platform: mqtt
+    topic: "switches/sat1/14"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.sat1_2
+      state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.sat1_2
+- alias: Button - Sat1_14 - Off
+  trigger:
+    platform: mqtt
+    topic: "switches/sat1/14"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.sat1_2
+      state: "on"
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.sat1_2
+
+- alias: Button - Sat1_21 - On
+  trigger:
+    platform: mqtt
+    topic: "switches/sat1/21"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.sat1_3
+      state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: light.sat1_3
+- alias: Button - Sat1_21 - Off
+  trigger:
+    platform: mqtt
+    topic: "switches/sat1/21"
+    payload: "PUSH"
+  condition:
+    - condition: state
+      entity_id: light.sat1_3
+      state: "on"
+  action:
+    service: homeassistant.turn_off
+    entity_id: light.sat1_3

@@ -11,6 +11,7 @@ default_view:
     - group.office
     - group.outdoors
     - group.christmas
+    - group.sat1
 
 downstairs:
   name: Downstairs
@@ -57,3 +58,21 @@ christmas:
   entities:
     - light.christmas_tree
     - light.christmas_outside
+
+sat1:
+  name: Sat1
+  entities:
+    - light.sat1_0
+    - light.sat1_1
+    - light.sat1_2
+    - light.sat1_3
+    - light.sat1_4
+    - light.sat1_5
+    - light.sat1_6
+    - light.sat1_10
+    - light.sat1_11
+    - light.sat1_15
+    - light.sat1_16
+    - light.sat1_27
+    - light.sat1_28
+    - light.sat1_29
