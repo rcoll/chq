@@ -10,8 +10,11 @@
 #define MAXBUF 1024
 #define DELIM "="
 #define CONFIGFILE "/etc/chqsat/chqsat.conf"
+#define LOGFILE "/var/log/chqsat.log"
 
 static volatile int runLoop = 1;
+
+FILE *logfile;
 
 MQTTClient client;
 MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
@@ -118,12 +121,12 @@ struct config get_config( char *filename ) {
 
 int setRelayState( int pin, int state ) {
 	if ( state != 1 && state != 0 ) {
-		printf( "OUTPUT > Requested relay state %d for pin %d is invalid!\n", state, pin );
+		fprintf( logfile, "OUTPUT > Requested relay state %d for pin %d is invalid!\n", state, pin );
 		return 0;
 	}
 
 	digitalWrite( pin, state );
-	printf( "OUTPUT > Set relay %d to state %d\n", pin, state );
+	fprintf( logfile, "OUTPUT > Set relay %d to state %d\n", pin, state );
 }
 
 void toggleRelay( int pin ) {
@@ -136,6 +139,7 @@ void toggleRelay( int pin ) {
 
 void handleInterrupt( int sig ) {
 	runLoop = 0;
+	fprintf( logfile, "SETUP > SIGINT\n" );
 	printf( "Caught SIGINT, exiting...\n" );
 }
 
@@ -152,7 +156,7 @@ int mqttMessagePublish( char topic[], char command[] ) {
 	pubmsg.qos = atoi( conf.mqttqos );
 	pubmsg.retained = 0;
 
-	printf( "MQTT > Publishing message %s to topic %s\n", command, topic );
+	fprintf( logfile, "MQTT > Publishing message %s to topic %s\n", command, topic );
 
 	MQTTClient_publishMessage( client, topic, &pubmsg, &deliveredToken );
 	rc = MQTTClient_waitForCompletion( client, deliveredToken, 10000L );
@@ -176,7 +180,7 @@ int mqttMessageReceived( void *context, char *topicName, int topicLen, MQTTClien
 		msg[i] = *payloadptr++;
 	}
 
-	printf( "MQTT > Topic %s received %s\n", topicName, msg );
+	fprintf( logfile, "MQTT > Topic %s received %s\n", topicName, msg );
 
 	MQTTClient_freeMessage( &message );
 	MQTTClient_free( topicName );
@@ -202,7 +206,7 @@ void selfTest() {
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		fprintf( logfile, "TEST > Testing output %d on pin %d\n", i, gpio );
 		digitalWrite( gpio, 1 );
 		usleep( 200000 );
 		digitalWrite( gpio, 0 );
@@ -211,21 +215,21 @@ void selfTest() {
 	
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		fprintf( logfile, "TEST > Testing output %d on pin %d\n", i, gpio );
 		digitalWrite( gpio, 1 );
 		usleep( 200000 );
 	}
 	
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		fprintf( logfile, "TEST > Testing output %d on pin %d\n", i, gpio );
 		digitalWrite( gpio, 0 );
 		usleep( 200000 );
 	}
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		fprintf( logfile, "TEST > Testing output %d on pin %d\n", i, gpio );
 		digitalWrite( gpio, 1 );
 	}
 
@@ -233,55 +237,68 @@ void selfTest() {
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		fprintf( logfile, "TEST > Testing output %d on pin %d\n", i, gpio );
 		digitalWrite( gpio, 0 );
 	}
 
 	for ( int i = 0; *( gpioInputs + i ); i++ ) {
 		gpio = atoi( *( gpioInputs + i ) );
 		int state = digitalRead( gpio );
-		printf( "TEST > Tested input %d on pin %d, it reads %d\n", i, gpio, state );
+		fprintf( logfile, "TEST > Tested input %d on pin %d, it reads %d\n", i, gpio, state );
 		usleep( 100000 );
 	}
 
-	printf( "TEST > All tests complete\n" );
+	fprintf( logfile, "TEST > All tests complete\n" );
 }
 
 int main( void ) {
 	struct config conf;
 	int gpio, i, rc, ch;
 	char **gpioInputs, **gpioOutputs, topic[MAXBUF], triggerid[MAXBUF];
-	
+
+	// Open the logfile
+	logfile = fopen( "/var/log/chqsat.log", "a+" );
+	if ( logfile == NULL ) {
+		printf( "Error opening logfile\n" );
+		return 1;
+	}
+
 	// Handle sigints
 	signal( SIGINT, handleInterrupt );
 
 	// Get the configuration settings
+	fprintf( logfile, "SETUP > Opening config file at %s\n", CONFIGFILE );
 	conf = get_config( CONFIGFILE );
 	gpioInputs = str_split( conf.switchpins, ',' );
 	gpioOutputs = str_split( conf.relaypins, ',' );
+	fprintf( logfile, "SETUP > Using switch pins %s\n", conf.switchpins );
+	fprintf( logfile, "SETUP > Using relay pins %s\n", conf.relaypins );
 
 	// Hardware state setup
+	fprintf( logfile, "SETUP > Running wiringPi setup\n" );
 	wiringPiSetup();
 
+	// Create the MQTT client
+	fprintf( logfile, "SETUP > Creating MQTT client\n" );
 	MQTTClient_create( &client, conf.mqttaddress, conf.mqttclientid, MQTTCLIENT_PERSISTENCE_NONE, NULL );
 	conn_opts.keepAliveInterval = 20;
 	conn_opts.cleansession = 1;
 	MQTTClient_setCallbacks( client, NULL, mqttConnectionLost, mqttMessageReceived, mqttMessageDelivered );
 
 	if ( ( rc = MQTTClient_connect( client, &conn_opts ) ) != MQTTCLIENT_SUCCESS ) {
-		printf( "SETUP > Failed to connect to MQTT server for subscription. Code %d", rc );
+		fprintf( logfile, "SETUP > Failed to connect to MQTT server for subscription. Code %d", rc );
 		exit( EXIT_FAILURE );
 	}
 
-	printf( "SETUP > Connected to MQTT broker at %s\n", conf.mqttaddress );
+	fprintf( logfile, "SETUP > Connected to MQTT broker at %s\n", conf.mqttaddress );
 	sprintf( topic, "relays/%s", conf.mqttprefix );
 	MQTTClient_subscribe( client, topic, atoi( conf.mqttqos ) );
-	printf( "SETUP > Subscribed to MQTT topic %s\n", topic );
+	fprintf( logfile, "SETUP > Subscribed to MQTT topic %s\n", topic );
 
 	if ( gpioInputs ) {
 		for ( i = 0; *( gpioInputs + i ); i++ ) {
 			gpio = atoi( *( gpioInputs + i ) );
-			printf( "SETUP > Setting up GPIO input on pin %d\n", gpio );
+			fprintf( logfile, "SETUP > Setting up GPIO input on pin %d\n", gpio );
 			pinMode( gpio, INPUT );
 			pullUpDnControl( gpio, PUD_UP );
 		}
@@ -290,30 +307,32 @@ int main( void ) {
 	if ( gpioOutputs ) {
 		for ( i = 0; *( gpioOutputs + i ); i++ ) {
 			gpio = atoi( *( gpioOutputs + i ) );
-			printf( "SETUP > Setting up GPIO output on pin %d\n", gpio );
+			fprintf( logfile, "SETUP > Setting up GPIO output on pin %d\n", gpio );
 			pinMode( gpio, OUTPUT );
 		}
 	}
 
 	selfTest( gpioInputs, gpioOutputs );
-	
+
 	while ( runLoop ) {
 		for ( i = 0; *( gpioInputs + i ); i++ ) {
 			gpio = atoi( * ( gpioInputs + i ) );
-			
+
 			// Handle Dual/Multi-Push
 
 			// Handle Long-Push
 
+			// Handle short-push
 			if ( digitalRead( gpio ) == 0 ) {
-
 				sprintf( topic, "switches/%s/%d", conf.mqttprefix, gpio );
-				printf( "INPUT > Button %d pushed\n", gpio );
+				fprintf( logfile, "INPUT > Button %d pushed\n", gpio );
 				mqttMessagePublish( topic, "PUSH" );
 				usleep( 300000 );
 			}
 
 		}
+
+		usleep( 30000 );
 	}
 
 	MQTTClient_disconnect( client, 10000 );
