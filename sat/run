@@ -1,5 +1,5 @@
 #!/bin/bash
 
-gcc -o chqsat chqsat.c -lpaho-mqtt3c -lwiringPi
+gcc -o chqsat chqsat.c -l paho-mqtt3c -l wiringPi
 sudo ./chqsat
 rm chqsat

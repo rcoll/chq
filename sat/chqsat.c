@@ -27,6 +27,45 @@ struct config {
 	char relaypins[MAXBUF];
 };
 
+char** str_split( char* a_str, const char a_delim ) {
+	char** result = 0;
+	size_t count = 0;
+	char* tmp = a_str;
+	char* last_comma = 0;
+	char delim[2];
+	delim[0] = a_delim;
+	delim[1] = 0;
+
+	while ( *tmp ) {
+		if ( a_delim == *tmp ) {
+			count++;
+			last_comma = tmp;
+		}
+		tmp++;
+	}
+
+	count += last_comma < ( a_str + strlen( a_str ) - 1 );
+	count++;
+
+	result = malloc( sizeof( char* ) * count );
+
+	if ( result ) {
+		size_t idx  = 0;
+		char* token = strtok( a_str, delim );
+
+		while ( token ) {
+			assert( idx < count );
+			*( result + idx++ ) = strdup( token );
+			token = strtok( 0, delim );
+		}
+	
+		assert( idx == count - 1 );
+		*( result + idx ) = 0;
+	}
+
+	return result;
+}
+
 struct config get_config( char *filename ) {
 	struct config configstruct;
 	FILE *file = fopen( filename, "r" );
@@ -75,45 +114,6 @@ struct config get_config( char *filename ) {
 	}
 
 	return configstruct;
-}
-
-char** str_split( char* a_str, const char a_delim ) {
-	char** result = 0;
-	size_t count = 0;
-	char* tmp = a_str;
-	char* last_comma = 0;
-	char delim[2];
-	delim[0] = a_delim;
-	delim[1] = 0;
-
-	while ( *tmp ) {
-		if ( a_delim == *tmp ) {
-			count++;
-			last_comma = tmp;
-		}
-		tmp++;
-	}
-
-	count += last_comma < ( a_str + strlen( a_str ) - 1 );
-	count++;
-
-	result = malloc( sizeof( char* ) * count );
-
-	if ( result ) {
-		size_t idx  = 0;
-		char* token = strtok( a_str, delim );
-
-		while ( token ) {
-			assert( idx < count );
-			*( result + idx++ ) = strdup( token );
-			token = strtok( 0, delim );
-		}
-	
-		assert( idx == count - 1 );
-		*( result + idx ) = 0;
-	}
-
-	return result;
 }
 
 int setRelayState( int pin, int state ) {
@@ -165,7 +165,7 @@ void mqttMessageDelivered( void *context, MQTTClient_deliveryToken dt ) {
 	deliveredToken = dt;
 }
 
-int mqttMessageArrived( void *context, char *topicName, int topicLen, MQTTClient_message *message ) {
+int mqttMessageReceived( void *context, char *topicName, int topicLen, MQTTClient_message *message ) {
 	int i;
 	char *payloadptr, *msg, **command;
 
@@ -191,6 +191,62 @@ void mqttConnectionLost( void *context, char *cause ) {
 	printf( "MQTT > Subscription connection lost - cause: %s\n", cause );
 }
 
+void selfTest() {
+	struct config conf;
+	int gpio;
+	char **gpioInputs, **gpioOutputs;
+
+	conf = get_config( CONFIGFILE );
+	gpioInputs = str_split( conf.switchpins, ',' );
+	gpioOutputs = str_split( conf.relaypins, ',' );
+
+	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
+		gpio = atoi( *( gpioOutputs + i ) );
+		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		digitalWrite( gpio, 1 );
+		usleep( 200000 );
+		digitalWrite( gpio, 0 );
+		usleep( 100000 );
+	}
+	
+	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
+		gpio = atoi( *( gpioOutputs + i ) );
+		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		digitalWrite( gpio, 1 );
+		usleep( 200000 );
+	}
+	
+	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
+		gpio = atoi( *( gpioOutputs + i ) );
+		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		digitalWrite( gpio, 0 );
+		usleep( 200000 );
+	}
+
+	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
+		gpio = atoi( *( gpioOutputs + i ) );
+		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		digitalWrite( gpio, 1 );
+	}
+
+	usleep( 2000000 );
+
+	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
+		gpio = atoi( *( gpioOutputs + i ) );
+		printf( "TEST > Testing output %d on pin %d\n", i, gpio );
+		digitalWrite( gpio, 0 );
+	}
+
+	for ( int i = 0; *( gpioInputs + i ); i++ ) {
+		gpio = atoi( *( gpioInputs + i ) );
+		int state = digitalRead( gpio );
+		printf( "TEST > Tested input %d on pin %d, it reads %d\n", i, gpio, state );
+		usleep( 100000 );
+	}
+
+	printf( "TEST > All tests complete\n" );
+}
+
 int main( void ) {
 	struct config conf;
 	int gpio, i, rc, ch;
@@ -210,7 +266,7 @@ int main( void ) {
 	MQTTClient_create( &client, conf.mqttaddress, conf.mqttclientid, MQTTCLIENT_PERSISTENCE_NONE, NULL );
 	conn_opts.keepAliveInterval = 20;
 	conn_opts.cleansession = 1;
-	MQTTClient_setCallbacks( client, NULL, mqttConnectionLost, mqttMessageArrived, mqttMessageDelivered );
+	MQTTClient_setCallbacks( client, NULL, mqttConnectionLost, mqttMessageReceived, mqttMessageDelivered );
 
 	if ( ( rc = MQTTClient_connect( client, &conn_opts ) ) != MQTTCLIENT_SUCCESS ) {
 		printf( "SETUP > Failed to connect to MQTT server for subscription. Code %d", rc );
@@ -238,12 +294,19 @@ int main( void ) {
 			pinMode( gpio, OUTPUT );
 		}
 	}
+
+	selfTest( gpioInputs, gpioOutputs );
 	
 	while ( runLoop ) {
 		for ( i = 0; *( gpioInputs + i ); i++ ) {
 			gpio = atoi( * ( gpioInputs + i ) );
 			
+			// Handle Dual/Multi-Push
+
+			// Handle Long-Push
+
 			if ( digitalRead( gpio ) == 0 ) {
+
 				sprintf( topic, "switches/%s/%d", conf.mqttprefix, gpio );
 				printf( "INPUT > Button %d pushed\n", gpio );
 				mqttMessagePublish( topic, "PUSH" );
