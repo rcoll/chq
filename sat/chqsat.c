@@ -178,12 +178,12 @@ struct config get_config( char *filename ) {
 
 int setRelayState( int pin, int state ) {
 	if ( state != 1 && state != 0 ) {
-		l( "OUTPUT > Requested relay state %d for pin %d is invalid!\n", state, pin );
+		l( "OUTPUT > Requested relay state %d for pin %d is invalid!", state, pin );
 		return 0;
 	}
 
 	digitalWrite( pin, state );
-	l( "OUTPUT > Set relay %d to state %d\n", pin, state );
+	l( "OUTPUT > Set relay %d to state %d", pin, state );
 }
 
 void toggleRelay( int pin ) {
@@ -196,7 +196,7 @@ void toggleRelay( int pin ) {
 
 void handleInterrupt( int sig ) {
 	runLoop = 0;
-	l( "SETUP > SIGINT\n" );
+	l( "SETUP > SIGINT" );
 }
 
 int mqttMessagePublish( char topic[], char command[] ) {
@@ -212,7 +212,7 @@ int mqttMessagePublish( char topic[], char command[] ) {
 	pubmsg.qos = atoi( conf.mqttqos );
 	pubmsg.retained = 0;
 
-	l( "MQTT > Publishing message %s to topic %s\n", command, topic );
+	l( "MQTT > Publishing message %s to topic %s", command, topic );
 
 	MQTTClient_publishMessage( client, topic, &pubmsg, &deliveredToken );
 	rc = MQTTClient_waitForCompletion( client, deliveredToken, 10000L );
@@ -221,7 +221,7 @@ int mqttMessagePublish( char topic[], char command[] ) {
 }
 
 void mqttMessageDelivered( void *context, MQTTClient_deliveryToken dt ) {
-	l( "MQTT > Token %d delivery confirmed\n", dt );
+	l( "MQTT > Token %d delivery confirmed", dt );
 	deliveredToken = dt;
 }
 
@@ -236,7 +236,7 @@ int mqttMessageReceived( void *context, char *topicName, int topicLen, MQTTClien
 		msg[i] = *payloadptr++;
 	}
 
-	l( "MQTT > Topic %s received %s\n", topicName, msg );
+	l( "MQTT > Topic %s received %s", topicName, msg );
 
 	MQTTClient_freeMessage( &message );
 	MQTTClient_free( topicName );
@@ -248,7 +248,7 @@ int mqttMessageReceived( void *context, char *topicName, int topicLen, MQTTClien
 }
 
 void mqttConnectionLost( void *context, char *cause ) {
-	l( "MQTT > Subscription connection lost - cause: %s\n", cause );
+	l( "MQTT > Subscription connection lost - cause: %s", cause );
 }
 
 void selfTest() {
@@ -262,7 +262,7 @@ void selfTest() {
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		l( "TEST > Testing output %d on pin %d\n", i, gpio );
+		l( "TEST > Testing output %d on pin %d", i, gpio );
 		digitalWrite( gpio, 1 );
 		usleep( 200000 );
 		digitalWrite( gpio, 0 );
@@ -271,21 +271,21 @@ void selfTest() {
 	
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		l( "TEST > Testing output %d on pin %d\n", i, gpio );
+		l( "TEST > Testing output %d on pin %d", i, gpio );
 		digitalWrite( gpio, 1 );
 		usleep( 200000 );
 	}
 	
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		l( "TEST > Testing output %d on pin %d\n", i, gpio );
+		l( "TEST > Testing output %d on pin %d", i, gpio );
 		digitalWrite( gpio, 0 );
 		usleep( 200000 );
 	}
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		l( "TEST > Testing output %d on pin %d\n", i, gpio );
+		l( "TEST > Testing output %d on pin %d", i, gpio );
 		digitalWrite( gpio, 1 );
 	}
 
@@ -293,18 +293,18 @@ void selfTest() {
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
-		l( "TEST > Testing output %d on pin %d\n", i, gpio );
+		l( "TEST > Testing output %d on pin %d", i, gpio );
 		digitalWrite( gpio, 0 );
 	}
 
 	for ( int i = 0; *( gpioInputs + i ); i++ ) {
 		gpio = atoi( *( gpioInputs + i ) );
 		int state = digitalRead( gpio );
-		l( "TEST > Tested input %d on pin %d, it reads %d\n", i, gpio, state );
+		l( "TEST > Tested input %d on pin %d, it reads %d", i, gpio, state );
 		usleep( 100000 );
 	}
 
-	l( "TEST > All tests complete\n" );
+	l( "TEST > All tests complete" );
 }
 
 int main( void ) {
@@ -316,19 +316,19 @@ int main( void ) {
 	signal( SIGINT, handleInterrupt );
 
 	// Get the configuration settings
-	l( "SETUP > Opening config file at %s\n", CONFIGFILE );
+	l( "SETUP > Opening config file at %s", CONFIGFILE );
 	conf = get_config( CONFIGFILE );
 	gpioInputs = str_split( conf.switchpins, ',' );
 	gpioOutputs = str_split( conf.relaypins, ',' );
-	l( "SETUP > Using switch pins %s\n", conf.switchpins );
-	l( "SETUP > Using relay pins %s\n", conf.relaypins );
+	l( "SETUP > Using switch pins %s", conf.switchpins );
+	l( "SETUP > Using relay pins %s", conf.relaypins );
 
 	// Hardware state setup
-	l( "SETUP > Running wiringPi setup\n" );
+	l( "SETUP > Running wiringPi setup" );
 	wiringPiSetup();
 
 	// Create the MQTT client
-	l( "SETUP > Creating MQTT client\n" );
+	l( "SETUP > Creating MQTT client" );
 	MQTTClient_create( &client, conf.mqttaddress, conf.mqttclientid, MQTTCLIENT_PERSISTENCE_NONE, NULL );
 	conn_opts.keepAliveInterval = 20;
 	conn_opts.cleansession = 1;
@@ -339,15 +339,15 @@ int main( void ) {
 		exit( EXIT_FAILURE );
 	}
 
-	l( "SETUP > Connected to MQTT broker at %s\n", conf.mqttaddress );
+	l( "SETUP > Connected to MQTT broker at %s", conf.mqttaddress );
 	sprintf( topic, "relays/%s", conf.mqttprefix );
 	MQTTClient_subscribe( client, topic, atoi( conf.mqttqos ) );
-	l( "SETUP > Subscribed to MQTT topic %s\n", topic );
+	l( "SETUP > Subscribed to MQTT topic %s", topic );
 
 	if ( gpioInputs ) {
 		for ( i = 0; *( gpioInputs + i ); i++ ) {
 			gpio = atoi( *( gpioInputs + i ) );
-			l( "SETUP > Setting up GPIO input on pin %d\n", gpio );
+			l( "SETUP > Setting up GPIO input on pin %d", gpio );
 			pinMode( gpio, INPUT );
 			pullUpDnControl( gpio, PUD_UP );
 		}
@@ -356,7 +356,7 @@ int main( void ) {
 	if ( gpioOutputs ) {
 		for ( i = 0; *( gpioOutputs + i ); i++ ) {
 			gpio = atoi( *( gpioOutputs + i ) );
-			l( "SETUP > Setting up GPIO output on pin %d\n", gpio );
+			l( "SETUP > Setting up GPIO output on pin %d", gpio );
 			pinMode( gpio, OUTPUT );
 		}
 	}
@@ -374,7 +374,7 @@ int main( void ) {
 			// Handle short-push
 			if ( digitalRead( gpio ) == 0 ) {
 				sprintf( topic, "switches/%s/%d", conf.mqttprefix, gpio );
-				l( "INPUT > Button %d pushed\n", gpio );
+				l( "INPUT > Button %d pushed", gpio );
 				mqttMessagePublish( topic, "PUSH" );
 				usleep( 300000 );
 			}
