@@ -10,7 +10,7 @@
 #define MAXBUF 1024
 #define DELIM "="
 #define CONFIGFILE "/etc/chqsat/chqsat.conf"
-#define LOG_PATH "log.txt"
+#define LOG_PATH "/var/log/chqsat.log"
 
 #define l( ... ) logPrint( __FILE__, __LINE__, __VA_ARGS__ )
 
