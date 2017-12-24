@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <signal.h>
+#include <stdarg.h>
+#include <time.h>
 #include <MQTTClient.h>
 #include <wiringPi.h>
 
@@ -46,7 +48,7 @@ void logPrint( char* filename, int line, char *fmt, ... ) {
 	size = strlen( timestr ) + 1 + 2;
 	timebuf = ( char* ) malloc( size );
 	memset( timebuf, 0x0, size );
-	snl( timebuf, size, "[%s]", timestr );
+	snprintf( timebuf, size, "[%s]", timestr );
 
 	if ( LOG_SESSION > 0 ) {
 		logfile = fopen ( LOG_PATH, "a+" );
@@ -54,7 +56,7 @@ void logPrint( char* filename, int line, char *fmt, ... ) {
 		logfile = fopen ( LOG_PATH, "w" );
 	}
 	 
-	fl( logfile, "%s [%s:%d] ", timebuf, filename, line );
+	fprintf( logfile, "%s [%s:%d] ", timebuf, filename, line );
 	va_start( list, fmt );
  
 	for ( p = fmt ; *p ; ++p ) {
@@ -64,12 +66,12 @@ void logPrint( char* filename, int line, char *fmt, ... ) {
 			switch ( *++p ) {
 				case 's': {
 					r = va_arg( list, char * );
-					fl(logfile,"%s", r);
+					fprintf(logfile,"%s", r);
 					continue;
 				}
 				case 'd': {
 					e = va_arg( list, int );
-					fl(logfile,"%d", e);
+					fprintf(logfile,"%d", e);
 					continue;
 				}
 				default: {
