@@ -182,6 +182,12 @@ int setRelayState( int pin, int state ) {
 		return 0;
 	}
 
+	if ( state == 0 ) {
+		state = 1;
+	} else {
+		state = 0;
+	}
+
 	digitalWrite( pin, state );
 	l( "OUTPUT > Set relay %d to state %d", pin, state );
 }
@@ -235,6 +241,7 @@ int mqttMessageReceived( void *context, char *topicName, int topicLen, MQTTClien
 	for ( i = 0; i < message->payloadlen; i++ ) {
 		msg[i] = *payloadptr++;
 	}
+	msg[ message->payloadlen ] = '\0';
 
 	l( "MQTT > Topic %s received %s", topicName, msg );
 
@@ -263,30 +270,30 @@ void selfTest() {
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
 		l( "TEST > Testing output %d on pin %d", i, gpio );
-		digitalWrite( gpio, 1 );
+		setRelayState( gpio, 1 );
 		usleep( 200000 );
-		digitalWrite( gpio, 0 );
+		setRelayState( gpio, 0 );
 		usleep( 100000 );
 	}
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
 		l( "TEST > Testing output %d on pin %d", i, gpio );
-		digitalWrite( gpio, 1 );
+		setRelayState( gpio, 1 );
 		usleep( 200000 );
 	}
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
 		l( "TEST > Testing output %d on pin %d", i, gpio );
-		digitalWrite( gpio, 0 );
+		setRelayState( gpio, 0 );
 		usleep( 200000 );
 	}
 
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
 		l( "TEST > Testing output %d on pin %d", i, gpio );
-		digitalWrite( gpio, 1 );
+		setRelayState( gpio, 1 );
 	}
 
 	usleep( 2000000 );
@@ -294,7 +301,7 @@ void selfTest() {
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
 		l( "TEST > Testing output %d on pin %d", i, gpio );
-		digitalWrite( gpio, 0 );
+		setRelayState( gpio, 0 );
 	}
 
 	for ( int i = 0; *( gpioInputs + i ); i++ ) {
