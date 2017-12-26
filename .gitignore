@@ -6,3 +6,5 @@ hass/homebridge
 .DS_Store
 hass/.DS_Store
 sat/.DS_Store
+sat/deploy
+deploy

@@ -55,10 +55,10 @@ void logPrint( char* filename, int line, char *fmt, ... ) {
 	} else {
 		logfile = fopen ( LOG_PATH, "w" );
 	}
-	 
+
 	fprintf( logfile, "%s [%s:%d] ", timebuf, filename, line );
 	va_start( list, fmt );
- 
+
 	for ( p = fmt ; *p ; ++p ) {
 		if ( *p != '%' ) {
 			fputc( *p,logfile );
@@ -118,7 +118,7 @@ char** str_split( char* a_str, const char a_delim ) {
 			*( result + idx++ ) = strdup( token );
 			token = strtok( 0, delim );
 		}
-	
+
 		assert( idx == count - 1 );
 		*( result + idx ) = 0;
 	}
@@ -202,7 +202,7 @@ void handleInterrupt( int sig ) {
 int mqttMessagePublish( char topic[], char command[] ) {
 	int rc;
 	struct config conf;
-	
+
 	MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
 	conf = get_config( CONFIGFILE );
@@ -268,14 +268,14 @@ void selfTest() {
 		digitalWrite( gpio, 0 );
 		usleep( 100000 );
 	}
-	
+
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
 		l( "TEST > Testing output %d on pin %d", i, gpio );
 		digitalWrite( gpio, 1 );
 		usleep( 200000 );
 	}
-	
+
 	for ( int i = 0; *( gpioOutputs + i ); i++ ) {
 		gpio = atoi( *( gpioOutputs + i ) );
 		l( "TEST > Testing output %d on pin %d", i, gpio );
@@ -367,18 +367,28 @@ int main( void ) {
 		for ( i = 0; *( gpioInputs + i ); i++ ) {
 			gpio = atoi( * ( gpioInputs + i ) );
 
-			// Handle Dual/Multi-Push
-
-			// Handle Long-Push
-
-			// Handle short-push
 			if ( digitalRead( gpio ) == 0 ) {
-				sprintf( topic, "switches/%s/%d", conf.mqttprefix, gpio );
-				l( "INPUT > Button %d pushed", gpio );
-				mqttMessagePublish( topic, "PUSH" );
-				usleep( 300000 );
-			}
+				clock_t t1, t2;
+				long elapsed;
+				t1 = clock();
 
+				while ( digitalRead( gpio ) == 0 ) {
+					// do nothing
+				}
+
+				t2 = clock();
+				elapsed = ( (double) t2 - t1 ) / CLOCKS_PER_SEC * 1000;
+
+				if ( elapsed < 1000 ) {
+					sprintf( topic, "switches/%s/%d", conf.mqttprefix, gpio );
+					l( "INPUT > Button %d short-pushed", gpio );
+					mqttMessagePublish( topic, "PUSH" );
+				} else {
+					sprintf( topic, "switches/%s/%d", conf.mqttprefix, gpio );
+					l( "INPUT > BUTTON %d long-pushed", gpio );
+					mqttMessagePublish( topic, "LONGPUSH" );
+				}
+			}
 		}
 
 		usleep( 30000 );
