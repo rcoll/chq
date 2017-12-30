@@ -14,3 +14,4 @@ uninstall:
 
 clean:
 	rm -Rf bin
+	rm /var/log/chqsat.log
