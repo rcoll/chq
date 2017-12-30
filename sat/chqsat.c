@@ -192,6 +192,8 @@ int setRelayState( int pin, int state ) {
 
 	digitalWrite( pin, state );
 	l( "OUTPUT > Set relay %d to state %d", pin, state );
+
+	return state;
 }
 
 void toggleRelay( int pin ) {
@@ -320,8 +322,8 @@ int main( void ) {
 	pid_t process_id = 0;
 	pid_t sid = 0;
 	struct config conf;
-	int gpio, i, rc, ch;
-	char **gpioInputs, **gpioOutputs, topic[MAXBUF], triggerid[MAXBUF];
+	int gpio, i, rc;
+	char **gpioInputs, **gpioOutputs, topic[MAXBUF];
 
 	// Create child process
 	process_id = fork();
@@ -334,7 +336,7 @@ int main( void ) {
 
 	// Kill the parent process
 	if ( process_id > 0 ) {
-		pritf( "Process forked successfully. Child id %d.\n", process_id );
+		printf( "Process forked successfully. Child id %d.\n", process_id );
 		exit( 0 );
 	}
 
@@ -379,6 +381,9 @@ int main( void ) {
 	conn_opts.keepAliveInterval = 20;
 	conn_opts.cleansession = 1;
 	MQTTClient_setCallbacks( client, NULL, mqttConnectionLost, mqttMessageReceived, mqttMessageDelivered );
+
+	// Give network some time to boot
+	sleep( 10 );
 
 	if ( ( rc = MQTTClient_connect( client, &conn_opts ) ) != MQTTCLIENT_SUCCESS ) {
 		l( "SETUP > Failed to connect to MQTT server for subscription. Code %d", rc );
