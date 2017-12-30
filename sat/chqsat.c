@@ -6,6 +6,8 @@
 #include <signal.h>
 #include <stdarg.h>
 #include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <MQTTClient.h>
 #include <wiringPi.h>
 
@@ -315,9 +317,46 @@ void selfTest() {
 }
 
 int main( void ) {
+	pid_t process_id = 0;
+	pid_t sid = 0;
 	struct config conf;
 	int gpio, i, rc, ch;
 	char **gpioInputs, **gpioOutputs, topic[MAXBUF], triggerid[MAXBUF];
+
+	// Create child process
+	process_id = fork();
+
+	// Indication of fork failure
+	if ( process_id < 0 ) {
+		printf( "Fork failed! Code 1.\n" );
+		exit( 1 );
+	}
+
+	// Kill the parent process
+	if ( process_id > 0 ) {
+		pritf( "Process forked successfully. Child id %d.\n", process_id );
+		exit( 0 );
+	}
+
+	// Unmask file mode
+	umask( 0 );
+
+	// Change cwd to root
+	chdir( "/" );
+
+	// Close stdin, stdout, stderr
+	close( STDIN_FILENO );
+	close( STDOUT_FILENO );
+	close( STDERR_FILENO );
+
+	// Set new session
+	sid = setsid();
+	if ( sid < 0 ) {
+		printf( "Fork failed. Code 2.\n" );
+		exit( 1 );
+	}
+
+
 
 	// Handle sigints
 	signal( SIGINT, handleInterrupt );
